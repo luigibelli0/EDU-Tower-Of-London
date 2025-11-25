@@ -1,0 +1,24 @@
+{
+	"format_version": 11,
+	"exported_world_bedrock": "WORLD_NAME",
+	"exported_world_edu": "WORLD_NAME_EDU",
+	"product_creator": "Shapescape",
+	"product_name": "Level Dat Updater Test",
+	"product_name_edu": "Level Dat Updater Test (Education Edition)",
+	"product_key": "YWN",
+	"product_description": "By Shapescape",
+	"edu_creator_uuid": "a423c8e7-21b1-40ea-b0f4-e1cdd048ee1e",
+	"edu_world_creator_uuid": "",
+	"enable_bedrock_pipeline": true,
+	"enable_edu_pipeline": false,
+	"settings": {
+		"multiplayer": true,
+		"cheats": false,
+		"sendCommandFeedback": false,
+		"commandBlockOutput": false,
+		"doDayLightCycle": true,
+		"doMobSpawning": true,
+		"difficulty": "normal",
+		"defaultGamemode": "survival"
+	}
+}

@@ -1,0 +1,4 @@
+db/** filter=lfs diff=lfs merge=lfs -text
+level.dat filter=lfs diff=lfs merge=lfs -text
+level.dat_old filter=lfs diff=lfs merge=lfs -text
+**/*.blend filter=lfs diff=lfs merge=lfs -text

@@ -1,0 +1,17 @@
+{
+	"modules": [
+		{
+			"language": "javascript",
+			"type": "script",
+			"uuid": "1bd3a174-3138-46e9-ab05-9ddce215fae5",
+			"version": [0, 0, 1],
+			"entry": "`f'scripts/shapescape/main.js'`"
+		}
+	],
+	"dependencies": [
+		{
+			"module_name": "@minecraft/server",
+			"version": "2.1.0"
+		}
+	]
+}

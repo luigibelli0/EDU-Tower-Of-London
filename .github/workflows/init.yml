@@ -1,0 +1,41 @@
+# Initialize the project with random UUIDs
+name: Init Project
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    if: ${{ !contains(github.repository, 'Template') }}
+    runs-on: ubuntu-latest
+
+    steps:
+      # Pull this repository
+      - uses: actions/checkout@v3
+      # GIT lfs files
+      - name: Cache git LFS
+        uses: actions/cache@v4.2.2
+        with:
+          path: .git/lfs
+          key: .git/lfs
+      - name: Pull LFS data
+        run: git lfs pull
+
+        # Install Python 3.10
+      - name: Install Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
+
+        # Initialize the project (generating UUIDs)
+      - name: Initialize the project
+        run: python ./.github/python/init.py ${{github.event.repository.name}} '.'
+      - name: Initialize the project
+        run: echo github.ref
+      # Commit the changes
+      - name: Git Commit/Push Changes
+        uses: actions-x/commit@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}

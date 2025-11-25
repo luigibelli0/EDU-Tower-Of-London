@@ -1,0 +1,55 @@
+name: Update to Addon Template
+
+on:
+  workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    # Pull this repository
+    - name: Download this project
+      uses: actions/checkout@v3
+      with:
+        lfs: true
+        path: minecraft_project
+        token: ${{ secrets.SHAPESCAPE_BOT_PERSONAL_ACCESS_TOKEN_ONLY_TOKEN }}
+
+    # Download external resources
+    - name: Setup Git Credentials for downloading Regolith-Template-World
+      uses: de-vri-es/setup-git-credentials@v2.0.8
+      with:
+        credentials: ${{ secrets.SHAPESCAPE_BOT_PERSONAL_ACCESS_TOKEN }}
+
+    - name: Download Regolith-Template-World
+      run: |
+        git clone https://github.com/ShapescapeMC/Regolith-Scripting-Template-Addon.git Template
+
+    # Install Python 3.10
+    - name: Install Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.10'
+
+    # Copy update_actions.py from template world
+    - name: Copy update_actions.py
+      uses: canastro/copy-file-action@master
+      with:
+        source: "Template/.github/python/update_actions.py"
+        target: "minecraft_project/.github/python/update_actions.py"
+
+    # Copy .github from regolith-template-world repo and remove init
+    - name: Initialize the project
+      run: |
+        cd minecraft_project
+        python ./.github/python/update_actions.py
+
+    # Commit the changes
+    - name: Git Commit/Push Changes
+      run: |
+        cd minecraft_project
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git add -A
+        git commit -m "Updated .github folder"
+        git push

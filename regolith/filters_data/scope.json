@@ -1,0 +1,10 @@
+{
+	"debug": false,
+
+	"namespace": "shapescape_xyz",
+	"dot_namespace": "shapescape_xyz.",
+	"colon_namespace": "shapescape_xyz:",
+	"path_namespace": "shapescape/xyz/",
+	"subfunction_path_namespace": "shapescape/xyz/xyz/",
+	"underscore_namespace": "shapescape_xyz_"
+}

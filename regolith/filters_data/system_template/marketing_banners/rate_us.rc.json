@@ -1,0 +1,22 @@
+{
+	"format_version": "1.10.0",
+	"render_controllers": {
+		"controller.render.shapescape.rate_us": {
+			"geometry": "Geometry.default",
+			"filter_lighting": true,
+			"materials": [{ "*": "Material.triple" }],
+			"textures": ["Texture.background", "Texture.background", "Texture.frame"]
+		},
+		"controller.render.shapescape.rate_us_text": {
+			"geometry": "Geometry.default",
+			"filter_lighting": true,
+			"materials": [{ "*": "Material.single" }],
+			"textures": ["Array.skins[query.life_time * 20]"],
+			"arrays": {
+				"textures": {
+					"Array.skins": "`[f'texture.f{i}' for i in range(rate_us_frame_count)]`"
+				}
+			}
+		}
+	}
+}

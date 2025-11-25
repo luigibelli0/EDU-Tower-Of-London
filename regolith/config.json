@@ -1,0 +1,380 @@
+{
+	"$schema": "https://raw.githubusercontent.com/Bedrock-OSS/regolith-schemas/main/config/v1.1.json",
+	"author": "Shapescape",
+	"name": "PROJECTNAME",
+	"packs": {
+		"behaviorPack": "./packs/BP",
+		"resourcePack": "./packs/RP"
+	},
+	"regolith": {
+		"dataPath": "filters_data",
+		"filterDefinitions": {
+			"cg_containers": {
+				"url": "github.com/Shapescape-Software/cg_containers",
+				"version": "1.2.1"
+			},
+			"cgg_world_settings": {
+				"url": "github.com/Shapescape-Software/cgg_world_settings",
+				"version": "1.0.2"
+			},
+			"content_guide_generator": {
+				"url": "github.com/Shapescape-Software/content_guide_generator",
+				"version": "1.7.5"
+			},
+			"copy_everywhere": {
+				"url": "github.com/Shapescape-Software/copy-everywhere",
+				"version": "1.0.0"
+			},
+			"debug_say_function_name": {
+				"url": "github.com/Nusiq/regolith-filters",
+				"version": "2.0.0"
+			},
+			"shapescape_world_settings": {
+				"url": "github.com/ShapescapeMC/Shapescape-World-Settings",
+				"version": "1.0.1"
+			},
+			"minify_json": {
+				"url": "github.com/Shapescape-Software/minify_json",
+				"version": "1.0.0"
+			},
+			"name_ninja": {
+				"url": "github.com/Bedrock-OSS/regolith-filters",
+				"version": "1.2.3"
+			},
+			"shapescape_default": {
+				"url": "github.com/Shapescape-Software/shapescape_default",
+				"version": "1.0.0"
+			},
+			"subfunctions": {
+				"url": "github.com/Nusiq/regolith-filters",
+				"version": "2.1.0"
+			},
+			"system_template": {
+				"url": "github.com/Nusiq/regolith-filters",
+				"version": "3.11.0"
+			},
+			"system_template_esbuild": {
+				"url": "github.com/Nusiq/regolith-filters",
+				"version": "2.1.0"
+			},
+			"text_replacer": {
+				"url": "github.com/Shapescape-Software/text_replacer",
+				"version": "1.1.0"
+			},
+			"texture_list": {
+				"url": "github.com/Bedrock-OSS/regolith-filters",
+				"version": "1.1.3"
+			}
+		},
+		"formatVersion": "1.4.0",
+		"profiles": {
+			"debug": {
+				"export": {
+					"target": "development"
+				},
+				"filters": [
+					{
+						"profile": "default"
+					},
+					{
+						"filter": "debug_say_function_name",
+						"settings": {
+							"exclude": [],
+							"include": [
+								"**/*.mcfunction"
+							],
+							"prefix": "",
+							"random_colors": true
+						}
+					}
+				]
+			},
+			"debugger": {
+				"export": {
+					"bpPath": "../debugger/bp",
+					"readOnly": true,
+					"rpPath": "../debugger/rp",
+					"target": "exact"
+				},
+				"filters": [
+					{
+						"filter": "subfunctions",
+						"settings": {
+							"scope_path": "scope.json"
+						}
+					},
+					{
+						"filter": "system_template",
+						"settings": {
+							"log_path": "system_template_log.json",
+							"scope": {
+								"esbuild_path": "BP/scripts/shapescape/smrf/"
+							},
+							"scope_path": "scope.json"
+						}
+					},
+					{
+						"filter": "copy_everywhere",
+						"settings": {
+							"values": [
+								{
+									"dest": "BP/scripts/node_modules",
+									"src": "data/node_modules/"
+								},
+								{
+									"dest": "BP/scripts/package-lock.json",
+									"src": "data/package-lock.json"
+								}
+							]
+						}
+					},
+					{
+						"filter": "system_template_esbuild",
+						"settings": {
+							"entryPoint": "BP/scripts/shapescape/smrf/main.ts",
+							"external": [
+								"@minecraft/server"
+							],
+							"minify": false,
+							"outfile": "`BP/scripts/{path_namespace}/main.js`",
+							"scope_path": "scope.json",
+							"sourcemap": true
+						}
+					},
+					{
+						"filter": "name_ninja",
+						"settings": {
+							"blocks": {
+								"auto_name": true
+							},
+							"entities": {
+								"auto_name": true
+							},
+							"items": {
+								"auto_name": true
+							},
+							"spawn_eggs": {
+								"auto_name": true,
+								"postfix": "",
+								"prefix": "§fSpawn §f"
+							}
+						}
+					},
+					{
+						"filter": "shapescape_default"
+					},
+					{
+						"filter": "text_replacer",
+						"settings": {
+							"rules": [
+								{
+									"source": "shapescape_",
+									"target": {
+										"path": "scope.json",
+										"type": "scope_variable",
+										"value": "underscore_namespace"
+									}
+								},
+								{
+									"source": "shapescape:",
+									"target": {
+										"path": "scope.json",
+										"type": "scope_variable",
+										"value": "colon_namespace"
+									}
+								},
+								{
+									"source": "shapescape/",
+									"target": {
+										"path": "scope.json",
+										"type": "scope_variable",
+										"value": "path_namespace"
+									}
+								},
+								{
+									"source": "shapescape.",
+									"target": {
+										"path": "scope.json",
+										"type": "scope_variable",
+										"value": "dot_namespace"
+									}
+								}
+							]
+						}
+					},
+					{
+						"filter": "text_replacer",
+						"settings": {
+							"rules": [
+								{
+									"source": {
+										"path": "scope.json",
+										"type": "scope_variable",
+										"value": "subfunction_path_namespace"
+									},
+									"target": {
+										"path": "scope.json",
+										"type": "scope_variable",
+										"value": "path_namespace"
+									}
+								}
+							]
+						}
+					}
+				]
+			},
+			"default": {
+				"export": {
+					"target": "development",
+					"build": "standard"
+				},
+				"filters": [
+					{
+						"filter": "subfunctions",
+						"settings": {
+							"scope_path": "scope.json"
+						}
+					},
+					{
+						"filter": "system_template",
+						"settings": {
+							"log_path": "system_template_log.json",
+							"scope": {
+								"esbuild_path": "data/system_template_esbuild"
+							},
+							"scope_path": "scope.json"
+						}
+					},
+					{
+						"filter": "system_template_esbuild",
+						"settings": {
+							"entryPoint": "data/system_template_esbuild/main.ts",
+							"external": [
+								"@minecraft/server"
+							],
+							"minify": false,
+							"outfile": "`BP/scripts/{path_namespace}/main.js`",
+							"scope_path": "scope.json"
+						}
+					},
+					{
+						"filter": "name_ninja",
+						"settings": {
+							"blocks": {
+								"auto_name": true
+							},
+							"entities": {
+								"auto_name": true
+							},
+							"items": {
+								"auto_name": true
+							},
+							"spawn_eggs": {
+								"auto_name": true,
+								"postfix": "",
+								"prefix": "§fSpawn §f"
+							}
+						}
+					},
+					{
+						"filter": "shapescape_default"
+					},
+					{
+						"filter": "text_replacer",
+						"settings": {
+							"rules": [
+								{
+									"source": "shapescape_",
+									"target": {
+										"path": "scope.json",
+										"type": "scope_variable",
+										"value": "underscore_namespace"
+									}
+								},
+								{
+									"source": "shapescape:",
+									"target": {
+										"path": "scope.json",
+										"type": "scope_variable",
+										"value": "colon_namespace"
+									}
+								},
+								{
+									"source": "shapescape/",
+									"target": {
+										"path": "scope.json",
+										"type": "scope_variable",
+										"value": "path_namespace"
+									}
+								},
+								{
+									"source": "shapescape.",
+									"target": {
+										"path": "scope.json",
+										"type": "scope_variable",
+										"value": "dot_namespace"
+									}
+								}
+							]
+						}
+					},
+					{
+						"filter": "text_replacer",
+						"settings": {
+							"rules": [
+								{
+									"source": {
+										"path": "scope.json",
+										"type": "scope_variable",
+										"value": "subfunction_path_namespace"
+									},
+									"target": {
+										"path": "scope.json",
+										"type": "scope_variable",
+										"value": "path_namespace"
+									}
+								}
+							]
+						}
+					},
+					{
+						"filter": "texture_list"
+					},
+					{
+						"filter": "cgg_world_settings"
+					},
+					{
+						"filter": "content_guide_generator"
+					}
+				]
+			},
+			"packaging": {
+				"export": {
+					"bpPath": "../behavior_packs/0",
+					"readOnly": false,
+					"rpPath": "../resource_packs/0",
+					"target": "exact"
+				},
+				"filters": [
+					{
+						"profile": "default"
+					},
+					{
+						"filter": "minify_json"
+					},
+					{
+						"filter": "shapescape_world_settings",
+						"settings": {
+							"level_dat_path": "worlds/WORLD_PLACEHOLDER/level.dat",
+							"levelname_path": "worlds/WORLD_PLACEHOLDER/levelname.txt",
+							"release_config_path": "../pack/release_config.json"
+						}
+					}
+				]
+			}
+		}
+	},
+	"worlds": [
+		"./worlds/*"
+	]
+}

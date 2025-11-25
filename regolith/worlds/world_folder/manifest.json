@@ -1,0 +1,19 @@
+{
+	"format_version": 2,
+	"header": {
+		"base_game_version": "INSERT BASE GAME VERSION HERE (Like this: [1, 14, 0])",
+		"name": "pack.name",
+		"description": "pack.description",
+		"version": [1, 0, 0],
+		"uuid": "INSERT NEW UUID HERE",
+		"lock_template_options": true,
+		"allow_random_seed": false
+	},
+	"modules": [
+		{
+			"version": [1, 0, 0],
+			"type": "world_template",
+			"uuid": "INSERT NEW UUID HERE"
+		}
+	]
+}

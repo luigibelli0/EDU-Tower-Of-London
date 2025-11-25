@@ -1,0 +1,130 @@
+name: Create Content Guide
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Cache git lfs
+        uses: actions/cache@v4.2.2
+        with:
+          path: .git/lfs
+          key: .git/lfs
+
+      - name: Pull lfs data, if not cached
+        run: git lfs pull
+
+      - name: setup-git-credentials
+        uses: de-vri-es/setup-git-credentials@v2.0.8
+        with:
+          credentials: ${{ secrets.SHAPESCAPE_BOT_PERSONAL_ACCESS_TOKEN }}
+
+      - name: Get upload URL
+        id: get_upload_url
+        uses: bruceadams/get-release@v1.3.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+
+      - name: Install md-to-pdf
+        run: npm i -g md-to-pdf
+
+      - name: Install custom fonts
+        run: |
+          mkdir -p ~/.fonts
+          cp .github/styling/fonts/* ~/.fonts
+          fc-cache -f -v
+
+      - name: Change version in function
+        id: change_version_in_function
+        env:
+          tag_name: ${{ steps.get_upload_url.outputs.tag_name }}
+        run: |
+          python ./.github/python/change_version_in_function.py $tag_name
+
+      - name: Install js modules
+        if: ${{ always() && (hashFiles('regolith/filters_data/package.json') != '') }}
+        id: install_js_modules
+        run: |
+          cd regolith/filters_data
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.SHAPESCAPE_API_ACCESS }}" > .npmrc
+          echo "@shapescape-software=https://npm.pkg.github.com/" >> .npmrc
+          echo "always-auth=true" >> .npmrc
+          npm i
+          cd ../..
+
+      - name: Run Regolith
+        id: run_regolith
+        run: |
+          cd regolith
+
+          wget https://github.com/Bedrock-OSS/regolith/releases/download/1.5.1/regolith_1.5.1_linux_386.tar.gz
+          tar xvf regolith_1.5.1_linux_386.tar.gz
+
+          export COM_MOJANG="./fake_com_mojang"
+
+          chmod +x regolith
+          ./regolith install-all
+          ./regolith run
+
+      - name: Read product name from JSON
+        id: read_product_name
+        run: echo "::set-output name=product_name::$(cat ./pack/release_config.json | jq -r '.product_name')"
+
+      - name: Extract three-digit semver from tag
+        id: extract_three_digit_semver
+        run: |
+          three_digit_semver=$(echo "${{ github.event.release.tag_name }}" | cut -d '.' -f 1-3)
+          echo "::set-output name=three_digit_semver::$three_digit_semver"
+
+      - name: Run md-to-pdf
+        id: run_md_to_pdf
+        run: |
+          pwd
+          cd regolith/filters_data/content_guide_generator
+          mkdir content_guide
+          md-to-pdf --launch-options '{"args":["--no-sandbox"]}' OUTPUT.md
+
+          asset_name=$(ls ./content_guide)
+          asset_path=./content_guide/$asset_name
+
+          echo "::set-output name=asset_name::$asset_name"
+          echo "::set-output name=asset_path::$asset_path"
+
+          product_name="${{ steps.read_product_name.outputs.product_name }}"
+          semver="${{ steps.extract_three_digit_semver.outputs.three_digit_semver }}"
+
+          new_name="Content Guide $product_name-$semver.pdf"
+          new_name="${new_name// /_}"  # Replace spaces with underscores
+          new_path="${asset_path%/*}/$new_name"
+
+          mv "$asset_path" "$new_path"
+
+          echo "::set-output name=renamed_asset_name::$new_name"
+          echo "::set-output name=renamed_asset_path::$(pwd)/$new_path"
+
+      - name: Upload Content Guide
+        id: upload-content-guide
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.get_upload_url.outputs.upload_url }}
+          asset_path: "${{ steps.run_md_to_pdf.outputs.renamed_asset_path }}"
+          asset_name: ${{ steps.run_md_to_pdf.outputs.renamed_asset_name }}
+          asset_content_type: application/zip

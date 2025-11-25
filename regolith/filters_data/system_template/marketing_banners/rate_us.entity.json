@@ -1,0 +1,30 @@
+{
+	"format_version": "1.10.0",
+	"minecraft:client_entity": {
+		"description": {
+			"identifier": "shapescape:marketing_rate_us",
+			"spawn_egg": {
+				"base_color": "#91221a",
+				"overlay_color": "#91221a"
+			},
+			"materials": {
+				"single": "entity_alphatest",
+				"double": "villager_v2_masked",
+				"triple": "entity_multitexture_alpha_test",
+				"anim": "charged_creeper"
+			},
+			"render_controllers": [
+				"controller.render.shapescape.follow_us_text",
+				"controller.render.shapescape.follow_us"
+			],
+			"geometry": {
+				"default": "geometry.shapescape.marketing_banner"
+			},
+			"textures": {
+				"frame": "textures/shapescape/entity/marketing_banners/frame/frame2",
+				"background": "textures/shapescape/entity/marketing_banners/background/background2",
+				"`[K(f'f{i}', number=i) for i in range(rate_us_frame_count)]`": "`f'textures/shapescape/entity/marketing_banners/rate_us_text/{number}'`"
+			}
+		}
+	}
+}

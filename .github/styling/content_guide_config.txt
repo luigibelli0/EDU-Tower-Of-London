@@ -1,0 +1,11 @@
+---
+dest: content_guide/content-guide-temp.pdf
+stylesheet:
+  - ../../../.github/styling/CGG.css
+body_class: markdown-body
+highlight_style: monokai
+pdf_options:
+  format: A4
+  margin: 10mm
+  printBackground: true
+---

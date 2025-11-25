@@ -1,0 +1,54 @@
+name: Run CG_Containers filter
+
+on:
+  workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    # Pull this repository
+    - name: Download this project
+      uses: actions/checkout@v3
+      with:
+        lfs: true
+        path: minecraft_project
+
+    - name: setup-git-credentials
+      uses: de-vri-es/setup-git-credentials@v2.0.8
+      with:
+        credentials: ${{ secrets.SHAPESCAPE_BOT_PERSONAL_ACCESS_TOKEN }}
+
+    - name: Cache git lfs
+      uses: actions/cache@v4.2.2
+      with:
+        path: .git/lfs
+        key: .git/lfs
+
+    - name: Pull lfs data, if not cached
+      run: git lfs pull
+
+    - name: Run Regolith filter
+      id: run_regolith
+      run: |
+        cd minecraft_project
+        cd regolith
+        
+        wget https://github.com/Bedrock-OSS/regolith/releases/download/1.3.0/regolith_1.3.0_linux_386.tar.gz
+        tar xvf regolith_1.3.0_linux_386.tar.gz
+        
+        chmod +x regolith
+        ./regolith install-all
+        ./regolith apply-filter cg_containers
+
+    # Commit the changes
+    - name: Git Commit/Push Changes
+      run: |
+          cd minecraft_project
+          git config pull.rebase false
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add regolith/filters_data/
+          git commit -m "Ran CG_Containers filter through GitHub Action"
+          git pull
+          git push

@@ -1,0 +1,136 @@
+name: Create Testing Files (Education Edition)
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  check_config:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.config_check.outputs.enabled }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Check if Education pipeline is enabled
+        id: config_check
+        run: |
+          ENABLED=$(python3 -c "import json; config=json.load(open('pack/release_config.json')); print(str(config.get('enable_edu_pipeline', False)).lower())")
+          echo "enabled=$ENABLED" >> $GITHUB_OUTPUT
+
+  build:
+    needs: check_config
+    if: needs.check_config.outputs.should_run == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Cache git lfs
+        uses: actions/cache@v4.2.2
+        with:
+          path: .git/lfs
+          key: .git/lfs
+
+      - name: Pull lfs data, if not cached
+        run: git lfs pull
+
+      - name: setup-git-credentials
+        uses: de-vri-es/setup-git-credentials@v2.0.8
+        with:
+          credentials: ${{ secrets.SHAPESCAPE_BOT_PERSONAL_ACCESS_TOKEN }}
+
+      - name: Get upload URL
+        id: get_upload_url
+        uses: bruceadams/get-release@v1.3.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.10'
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+
+      - name: Change version in function
+        id: change_version_in_function
+        env:
+          tag_name: ${{ steps.get_upload_url.outputs.tag_name }}
+        run: |
+          python ./.github/python/change_version_in_function.py $tag_name
+
+      - name: Install js modules
+        if: ${{ always() && (hashFiles('regolith/filters_data/package.json') != '') }}
+        id: install_js_modules
+        run: |
+          cd regolith/filters_data
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.SHAPESCAPE_API_ACCESS }}" > .npmrc
+          echo "@shapescape-software=https://npm.pkg.github.com/" >> .npmrc
+          echo "always-auth=true" >> .npmrc
+          npm i
+          cd ../..
+
+      - name: Run Regolith
+        id: run_regolith
+        run: |
+          cd regolith
+          
+          wget https://github.com/Bedrock-OSS/regolith/releases/download/1.5.1/regolith_1.5.1_linux_386.tar.gz
+          tar xvf regolith_1.5.1_linux_386.tar.gz
+          
+          chmod +x regolith
+          ./regolith install-all
+          ./regolith run packaging
+          cd ..
+          cd behavior_packs/0
+          rm -r -f ./node_modules
+
+      - name: Create pack file
+        id: create_pack_file
+        env:
+          upload_url: ${{ steps.get_upload_url.outputs.upload_url }}
+          tag_name: ${{ steps.get_upload_url.outputs.tag_name }}
+        run: |
+          echo INFO: downloading pillow and nbtlib modules for Python
+          pip install pillow nbtlib
+          
+          python ./.github/python/create_testing_files_edu.py ~/zip_tmp '.' ~/mctemplate_file_dir ~/mcworld_file_dir $tag_name
+          
+          asset_name_1=$(ls ~/mcworld_file_dir)
+          asset_name_2=$(ls ~/mctemplate_file_dir)
+          
+          asset_path_1=~/mcworld_file_dir/$asset_name_1
+          asset_path_2=~/mctemplate_file_dir/$asset_name_2
+          
+          echo "asset_name_1=$asset_name_1" >> $GITHUB_OUTPUT
+          echo "asset_name_2=$asset_name_2" >> $GITHUB_OUTPUT
+          echo "asset_path_1=$asset_path_1" >> $GITHUB_OUTPUT
+          echo "asset_path_2=$asset_path_2" >> $GITHUB_OUTPUT
+
+
+      - name: Upload mcworld (EDU)
+        id: upload-mcworld
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.get_upload_url.outputs.upload_url }}
+          asset_path: ${{ steps.create_pack_file.outputs.asset_path_1 }}
+          asset_name: ${{ steps.create_pack_file.outputs.asset_name_1 }}
+          asset_content_type: application/zip
+
+      - name: Upload mctemplate (EDU)
+        id: upload-mctemplate
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.get_upload_url.outputs.upload_url }}
+          asset_path: ${{ steps.create_pack_file.outputs.asset_path_2 }}
+          asset_name: ${{ steps.create_pack_file.outputs.asset_name_2 }}
+          asset_content_type: application/zip

@@ -1,0 +1,270 @@
+@page {
+    size: A4;
+    margin: 20mm;
+    /* Equal margins on all sides */
+}
+
+/* Header */
+.header table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: separate;
+    margin-bottom: 0;
+    border-color: white;
+}
+
+.header table tr {
+    display: table-row;
+}
+
+.header table th {
+    width: 25%;
+    /* Adjust based on number of columns */
+    height: 100px;
+    /* Set fixed height for header cells */
+    padding: 0;
+    font-size: initial;
+    text-align: center;
+    word-wrap: normal;
+    word-break: normal;
+    overflow: hidden;
+    display: table-cell;
+    vertical-align: middle;
+    position: relative;
+    background-color: white;
+    border-color: white;
+    /* Add this for absolute positioning of image */
+}
+
+.header table th:last-child {
+    width: 25%;
+    /* Keep consistent with other cells */
+}
+
+.header table th img {
+    position: absolute;
+    /* Position image absolutely within the cell */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    /* Change to contain to prevent overflow */
+    object-position: center;
+}
+
+/* Headings */
+h1 {
+    font-family: "PP Agrandir Heavy";
+    font-size: 24pt;
+    /* Standard heading size */
+    color: #041c3b;
+}
+
+h1.title {
+    font-size: 24pt;
+    color: white;
+    background-color: #041c3b;
+    border: 1px solid #041c3b;
+    border-radius: 2px;
+    padding: 10pt;
+    /* Increased padding for better balance */
+}
+
+h1.large-centered {
+    font-size: 32pt;
+    /* Adjusted heading size */
+    text-align: center;
+    padding: 10pt;
+}
+
+h2.large-centered {
+    font-size: 18pt;
+    /* Scaled for better readability */
+    text-align: center;
+}
+
+h2 {
+    font-family: "PP Agrandir Heavy";
+    font-size: 16pt;
+    color: #041c3b;
+}
+
+h3 {
+    font-family: "PP Agrandir Heavy";
+    font-size: 14pt;
+    color: #041c3b;
+}
+
+h4 {
+    font-family: "PP Agrandir Heavy";
+    font-size: 13pt;
+    margin-bottom: 5pt;
+    color: #041c3b;
+    /* Positive spacing for better flow */
+}
+
+h5 {
+    font-family: "PP Agrandir Heavy";
+    font-size: 12pt;
+    color: #041c3b;
+}
+
+h6 {
+    font-family: "PP Agrandir Heavy";
+    font-size: 10pt;
+    color: #041c3b;
+}
+
+h4::before {
+    content: "■ ";
+    color: #041c3b;
+}
+
+h5::before {
+    content: "■ ";
+    color: #cfb7f5;
+}
+
+h6::before {
+    content: "■ ";
+    color: #cdf462;
+}
+
+/* Body text and overall layout */
+body {
+    font-family: "Inter";
+    font-size: 11pt;
+    /* General document text size */
+}
+
+/* Paragraphs */
+p {
+    font-size: 11pt;
+    /* Common print size for body text */
+    line-height: 1.5;
+    /* Improved readability */
+}
+
+/* General table styles */
+table th,
+table td {
+    border: 1px solid lightgray;
+    padding: 5pt;
+    font-size: 11pt;
+    text-align: left;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
+table th {
+    background-color: #041c3b;
+    color: white;
+    font-weight: bold;
+}
+
+/* Flex layout for regular tables */
+table:not(.hidden_table) tr {
+    display: flex;
+}
+
+table:not(.hidden_table) th,
+table:not(.hidden_table) td {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+table:not(.hidden_table) th:last-child,
+table:not(.hidden_table) td:last-child {
+    flex: 0 0 12%;
+}
+
+/* Specific styles for the hidden_table class */
+.hidden_table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    /* This ensures the table respects the width we set */
+}
+
+.hidden_table th,
+.hidden_table td {
+    border: none;
+    vertical-align: top;
+}
+
+.hidden_table td:first-child {
+    width: 70%;
+    /* First column takes 70% */
+}
+
+.hidden_table td:last-child {
+    width: 30%;
+    /* Second column always takes 30% */
+}
+
+.hidden_table img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    /* This removes any extra space below the image */
+}
+
+/* Lists */
+ol,
+ul {
+    font-size: 11pt;
+    margin-left: -0.1in;
+    /* Adjusted for consistent indentation */
+    margin-bottom: 10pt;
+    margin-top: 10pt;
+}
+
+ol li,
+ul li {
+    font-size: 11pt;
+    margin-bottom: 6pt;
+}
+
+/* Blockquote */
+blockquote {
+    border: 1px solid lightgray;
+    border-radius: 2pt;
+    padding: 10pt;
+    margin: 0;
+    background-color: whitesmoke;
+    font-size: 11pt;
+}
+
+/* Code blocks */
+p code,
+pre {
+    background-color: #041c3b;
+    border: 1px solid #041c3b;
+    color: #cdf462;
+    border-radius: 2pt;
+    font-size: 10pt;
+    padding: 5pt;
+    margin-bottom: 1em;
+}
+
+/* Links */
+a {
+    font-family: Arial, Helvetica, sans-serif;
+    color: #041c3b;
+    text-decoration: none;
+}
+
+/* Bold text */
+b,
+strong {
+    color: #041c3b;
+    font-weight: bold;
+}
+
+/* Images */
+img.main {
+    max-width: 100%;
+    height: auto;
+}
